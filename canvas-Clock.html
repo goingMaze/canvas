@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<canvas id="drawing" width="400" height="400"></canvas>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				var drawing = document.getElementById('drawing');
+				var context = drawing.getContext('2d');
+
+				var secondHand = new Line(drawing.width / 2 - 40, 1, "#ff0000");
+				var minuteHand = new Line(drawing.width / 2 - 75, 1, "#0000ff");
+				var hourHand = new Line(drawing.width / 2 - 115, 1, "#00ff00");
+				secondHand.x = minuteHand.x = hourHand.x = drawing.width / 2;
+				secondHand.y = minuteHand.y = hourHand.y = drawing.height / 2;
+
+				var count = 0;
+
+				var _run = function() {
+
+					if (count == 60) {
+						drawFun(context, secondHand, minuteHand, hourHand);
+						Dial(context);
+					} else {
+						count++;
+					}
+
+					window.requestAnimationFrame(_run, drawing);
+				}
+
+				_run();
+			}
+
+			/*
+			 * 绘制时分秒指针
+			 */
+			var drawFun = function(context, secondHand, minuteHand, hourHand) {
+				context.clearRect(0, 0, drawing.width, drawing.height);
+				count = 0;
+				var now = new Date();
+				var second = now.getSeconds();
+				var minute = now.getMinutes();
+				var hour = now.getHours();
+
+				context.save();
+				context.beginPath();
+				context.translate(drawing.width / 2, drawing.height / 2);
+				context.arc(0, 0, drawing.width / 2 - 11, 0, Math.PI * 2, false);
+				context.moveTo(drawing.width / 2 - 1, 0);
+				context.arc(0, 0, drawing.width / 2 - 1, 0, Math.PI * 2, false);
+				context.strokeStyle = "#E68A00";
+				context.stroke();
+				context.closePath();
+				context.restore();
+
+				secondHand.rotation = angleToRadian(second * 6 - 90);
+				secondHand.paint(context, 0, 0);
+
+				minuteHand.rotation = angleToRadian(minute * 6 - 90);
+				minuteHand.paint(context, 0, 0);
+
+				hour = hour % 12;
+				hourHand.rotation = angleToRadian(hour * 30 - 90);
+				hourHand.paint(context, 0, 0);
+
+			}
+
+			/*
+			 * 画线
+			 */
+			function Line(width, height, color) {
+				this.x = 0;
+				this.y = 0;
+				this.width = width || 100;
+				this.height = height || 1;
+				this.color = color || "#ff0000";
+				this.rotation = 0;
+			}
+
+			Line.prototype.paint = function(context, x, y) {
+				context.save();
+				context.translate(this.x, this.y);
+				context.rotate(this.rotation);
+				context.strokeStyle = this.color;
+				context.lineWidth = this.height;
+				context.beginPath();
+				context.moveTo(x, y);
+				context.lineTo(this.width, 0);
+				context.closePath();
+				context.stroke();
+				context.restore();
+			}
+
+			/*
+			 * 重新绘制表盘
+			 */
+			function Dial(context) {
+				context.save();
+				context.translate(drawing.width / 2, drawing.height / 2);
+
+				context.beginPath();
+				context.textAlign = "center";
+				context.textBaseline = "middle";
+
+				var coordinate = {};
+				var angle, radius, count = 0;
+
+				for (i = 0; i < 60; i++) {
+					var hourTickMark = new Line(drawing.height / 2 - 20, 1, "#ff0000");
+					var minuteTickMark = new Line(drawing.height / 2 - 20, 1, "#0000ff");
+
+					hourTickMark.x = minuteTickMark.x = 0;
+					hourTickMark.x = minuteTickMark.x = 0;
+					hourTickMark.color = minuteTickMark.color = "#000000";
+
+					if (i % 5 == 0) {
+						angle = (count - 2) * 30;
+						count++;
+						radius = drawing.height / 2 - 30;
+
+						coordinate = calCoordinate(0, 0, drawing.height / 2 - 50, angle);
+						context.fillText(count, coordinate.x, coordinate.y);
+
+						hourTickMark.rotation = angleToRadian(angle);
+						hourTickMark.paint(context, drawing.height / 2 - 35, 0);
+					} else {
+						angle = i * 6;
+						radius = drawing.height / 2 - 25;
+						minuteTickMark.rotation = angleToRadian(angle);
+						minuteTickMark.paint(context, drawing.height / 2 - 30, 0);
+					}
+				}
+
+				context.strokeStyle = "#000000";
+				context.stroke();
+				context.closePath();
+
+				context.restore();
+			}
+
+			/*
+			 * 根据圆心、半径、角度计算圆边上坐标
+			 */
+			function calCoordinate(x, y, r, angle) {
+				var obj = {};
+				angle = angleToRadian(angle);
+				obj.x = x + r * Math.cos(angle);
+				obj.y = x + r * Math.sin(angle);
+
+				return obj;
+			}
+
+			/*
+			 * 角度转弧度
+			 */
+			function angleToRadian(angle) {
+				var radian = angle * Math / 180;
+				return radian;
+			}
+		</script>
+	</body>
+
+</html>
