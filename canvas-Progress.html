@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+		<style type="text/css">
+			.progress {
+				height: 20px;
+				background-color: #00FFdd;
+				width: 1px;
+				margin-bottom: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="progress">0%</div>
+		<input type="button" name="runBtn" id="runBtn" value="run" />
+		<script src="../js/tween.js" type="text/javascript" charset="utf-8"></script>
+		
+		<script type="text/javascript">
+			var progress = 0;
+			document.getElementById('runBtn').addEventListener('click', function(){
+				step();
+			}, false);
+			
+			function step() {
+				progress++;
+				var width = Tween.Bounce.easeInOut(progress, 0, 100, 100);
+				document.getElementsByClassName('progress')[0].style.width = width + "%";
+				document.getElementsByClassName('progress')[0].innerHTML = width + "%";
+				
+				if(progress<100){
+					window.requestAnimationFrame(step);
+				}else {
+					progress = 0;
+				}
+			}
+		</script>
+	</body>
+</html>

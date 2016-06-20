@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<canvas id="drawing" width="400" height="400"></canvas>
+
+		<script type="text/javascript">
+			var drawing = document.getElementById('drawing');
+			var context = drawing.getContext('2d');
+
+			/*
+			 * 正弦余弦球波动
+			 */
+			function run() {
+				var ball = new Ball();
+				ball.x = drawing.width / 3;
+				ball.y = drawing.height / 2;
+				ball.radius = 30;
+				ball.color = '#ff0033';
+
+				var newBall = new Ball();
+				newBall.x = drawing.width / 3 * 2;
+				newBall.y = drawing.height / 2;
+				newBall.radius = 30;
+				newBall.color = '#0f0';
+
+				var angle = 0;
+				var vr = 1 * Math.PI / 180;
+				(function animationLoop() {
+					window.requestAnimationFrame(animationLoop);
+
+					context.clearRect(0, 0, drawing.width, drawing.height);
+
+					ball.y = drawing.width / 2 * (1 - Math.cos(angle)) * 0.8 + 30;
+					ball.x += 1/5;
+					angle += vr;
+					ball.paint(context);
+					if(ball.x > 400) {
+						ball.x = 0;
+					}
+
+					newBall.y = drawing.width / 2 * (1 - Math.sin(angle)) * 0.8 + 30;
+					newBall.paint(context);
+				})();
+			}
+
+			/*
+			 * 绘制球
+			 */
+			function Ball(radius, color) {
+				this.x = 0;
+				this.y = 0;
+				this.radius = radius || 20;
+				this.color = color || '#0f0';
+				this.scaleX = 1;
+				this.scaleY = 1;
+				this.lineWidth = 1;
+			}
+
+			Ball.prototype.paint = function(context) {
+				context.save();
+				context.translate(this.x, this.y);
+				context.scale(this.scaleX, this.scaleY);
+				context.lineWidth = this.lineWidth;
+				context.fillStyle = this.color;
+
+				context.beginPath();
+				context.arc(0, 0, this.radius, 0, Math.PI * 2, true);
+				context.closePath();
+				context.fill();
+
+				if (context.lineWidth > 0) {
+					context.stroke();
+				}
+				context.restore();
+			}
+
+			/*
+			 * 绘制正弦、余弦曲线
+			 */
+			function getSinWave(context, x, y, width, height) {
+				context.save();
+				context.translate(x, y);
+				context.beginPath();
+
+				for (var i = 0; i < 360; i++) {
+					context.lineTo(i * width, Math.sin(i * height * Math.PI / 180) * height);
+				}
+
+				context.moveTo(0, 200);
+
+				for (var i = 0; i < 360; i++) {
+					context.lineTo(i * width, 200 + Math.cos(i * height * Math.PI / 180) * height);
+				}
+				context.stroke();
+				context.closePath();
+				context.restore();
+			}
+
+			run();
+		</script>
+	</body>
+
+</html>

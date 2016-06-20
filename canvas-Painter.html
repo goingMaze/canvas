@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas {
+				border: 1px solid #31B0D5;
+			}
+		</style>
+	</head>
+
+	<body>
+		<canvas id="painter" width="400" height="400"></canvas>
+
+		<script type="text/javascript">
+			var painter = document.getElementById('painter');
+			var context = painter.getContext('2d');
+			var imageData = context.getImageData(0, 0, painter.width, painter.height);
+			var pixels = imageData.data;
+			var brush_width = 20,
+				brush_destiny = 50,
+				brush_color = '#ffffff';
+
+			painter.addEventListener('mousedown', function(event) {
+				context.strokeStyle = getRadomColor();
+				brush_color = parseColor(context.strokeStyle, true);
+				context.beginPath();
+				context.moveTo(event.pageX, event.pageY);
+				painter.addEventListener('mousemove', onMouseMove, false);
+			}, false);
+
+			function onMouseMove(event) {
+				context.lineTo(event.pageX, event.pageY);
+
+				for (i = 0; i < brush_destiny; i++) {
+					var angle = Math.random() * Math.PI * 2;
+					var radius = Math.random() * brush_width;
+					var positionX = (event.pageX + radius * Math.cos(angle)) | 0;
+					var positionY = (event.pageY + radius * Math.sin(angle)) | 0;
+
+					var offset = (positionX + positionY * imageData.width) * 4;
+
+					pixels[offset] = brush_color >> 16 & 0xff;
+					pixels[offset + 1] = brush_color >> 8 & 0xff;
+					pixels[offset + 2] = brush_color & 0xff;
+					pixels[offset + 3] = 255;
+				}
+				context.putImageData(imageData, 0, 0);
+
+				context.stroke();
+			}
+
+			painter.addEventListener('mouseup', function(event) {
+				context.closePath();
+				painter.removeEventListener('mousemove', onMouseMove, false);
+			});
+
+			/*
+			 * 随机颜色
+			 */
+			function getRadomColor() {
+				var colorNumber = Math.random() * 0xffffff | 0;
+				var color = '#' + ('00000' + colorNumber.toString(16)).substr(-6);
+				return color;
+			}
+
+			/*
+			 * 颜色处理
+			 */
+			function parseColor(color, toNumber) {
+				if (toNumber === true) {
+					// 将指定的色彩转化为数字值  
+					if (typeof color === 'number') {
+						return color | 0;
+					}
+					if (typeof color === 'string' && color[0] === '#') {
+						color = color.slice(1);
+					}
+					return parseInt(color, 16);
+				} else {
+					// 将输入的数字转换为RGB色彩值
+					if (typeof color === 'number') {
+						color = '#' + ('00000' + (color | 0)).toString(16).substr(-6);
+					}
+					return color;
+				}
+			}
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+		<style type="text/css">
+			.demo {
+				height: 620px;
+				position: relative;
+			}
+		
+			.demo ball {
+				width: 100px;
+				height: 100px;
+				border-radius: 50px;
+				margin-left: -50px;
+				background-color: #D0E9C6;
+				position: absolute;
+				left: 50%;
+				top: 500px;
+				background-image: -webkit-radial-gradient(100px 100px at 50px 20px, #a0b3d6, #34538b);
+				background-image: radial-gradient(100px 100px at 50px 20px, #a0b3d6, #34538b);
+				z-index: 1;
+			}
+			
+			.demo shadow {
+				position: absolute;
+				width: 100px;
+				height: 30px;
+				left: 50%;
+				margin-left: -50px;
+				bottom: 5px;
+				background-image: radial-gradient(ellipse closest-side, rgba(0,0,0,0.75), rgba(0,0,0,0));
+				background-image: -webkit-radial-gradient(ellipse closest-side, rgba(0,0,0,0.75), rgba(0,0,0,0));
+			}
+		</style>
+	</head>
+	<body>
+		<div class="demo">
+			<ball></ball>
+			<shadow></shadow>
+		</div>
+		
+		<script src="../js/jquery-2.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/tween.js" type="text/javascript" charset="utf-8"></script>
+		
+		<script type="text/javascript">
+			var ball = $('ball'), shadow = $('shadow');
+			var objBall = {};
+			
+			var shadowWithBall = function(top) {
+				var top = top || ball.css('top');
+				var scale = 1+(500-top)/600;
+				var opacity = 1-(500-top)/600;
+				
+				shadow.css('opacity', opacity).css('transform', 'scale('+[scale, scale].join(',')+')');
+			},
+			fallFun = function() {
+				var start = 0, duration = 100;
+				
+				var _run = function() {
+					start++;
+					var top = Tween.Bounce.easeOut(start, objBall.top, 500-objBall.top, duration);
+					ball.css('top', top);
+					shadowWithBall(top);
+					if(start < duration) {
+						window.requestAnimationFrame(_run);
+					}
+				}
+				_run();
+			}
+			
+			ball.bind('mousedown', function(){
+				objBall.pageY = event.pageY;
+				objBall.ballFlag = true;
+			});
+			
+			$(document).bind('mousemove', function(){
+				if(objBall.ballFlag){
+					objBall.top = 500 - (objBall.pageY - event.pageY);
+					if(objBall.top < 0){
+						objBall.top = 0;
+					}
+					if(objBall.top > 500) {
+						objBall.top = 500;
+					}
+					ball.css('top', objBall.top);
+					shadowWithBall(objBall.top);
+				}
+			});
+			
+			$(document).bind('mouseup', function(){
+				if(objBall.ballFlag){
+					fallFun();
+				}
+				objBall.ballFlag = false;
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas {
+				border: 1px solid #E4B9B9;
+			}
+		</style>
+	</head>
+
+	<body>
+		<canvas id="gradient" width="400" height="400"></canvas>
+
+		<script type="text/javascript">
+			var gradient = document.getElementById('gradient');
+			var context = gradient.getContext('2d');
+			var point1 = {
+					x: 0,
+					y: 0
+				},
+				point2 = {
+					x: 200,
+					y: 100
+				};
+
+			var gradient1 = context.createLinearGradient(point1.x, point1.y, point2.x, point2.y);
+			gradient1.addColorStop(0, '#0d0');
+			gradient1.addColorStop(0.5, '#00a');
+			gradient1.addColorStop(1, '#0fa')
+
+			context.fillStyle = gradient1;
+			context.fillRect(0, 0, 200, 100);
+			context.fillRect(0, 100, 400, 100);
+
+			var circle1 = {
+					x: 200,
+					y: 300,
+					r: 20
+				},
+				circle2 = {
+					x: 200,
+					y: 300,
+					r: 50
+				};
+			var gradient2 = context.createRadialGradient(circle1.x, circle1.y, circle1.r, circle2.x, circle2.y, circle2.r);
+			gradient2.addColorStop(0, '#efa');
+			gradient2.addColorStop(1, '#0ed');
+			gradient2.addColorStop(0.7, '#0e9');
+			
+			context.fillStyle = gradient2;
+			context.arc(200, 300, 50, 0, Math.PI*2, false);
+
+			context.fill();
+		</script>
+	</body>
+
+</html>
